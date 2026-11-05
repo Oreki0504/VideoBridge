@@ -1,0 +1,22 @@
+# Default: automatically detect text files
+* text=auto
+
+# Source code: always LF
+*.go       text eol=lf
+*.py       text eol=lf
+*.ts       text eol=lf
+*.tsx      text eol=lf
+*.js       text eol=lf
+*.json     text eol=lf
+*.sh       text eol=lf
+
+# Documentation and configuration
+*.md       text eol=lf
+*.yaml     text eol=lf
+*.yml      text eol=lf
+*.toml     text eol=lf
+
+# Windows scripts
+*.bat      text eol=crlf
+*.cmd      text eol=crlf
+*.ps1      text eol=crlf

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>VideoBridge</title></head>
+  <body>
+    <main>
+      <header><span class="brand-mark" aria-hidden="true">↧</span><div><h1>VideoBridge</h1><p id="brand-subtitle">浏览器里的视频，本地的文件。</p></div><div class="header-meta"><button id="lang-toggle" class="lang-toggle" type="button" title="Switch to English">EN</button><span class="version">0.8.0</span></div></header>
+      <section class="video"><div class="eyebrow"><span class="dot"></span> <span id="site-label">当前页面</span></div><h2 id="video-title">正在读取视频…</h2><p id="video-url" class="muted"></p><p id="x-hint" class="muted" hidden>默认下载帖子中的第一个视频；链接含 /video/2 等编号时下载对应视频。X 默认使用匿名模式。</p></section>
+      <section class="options">
+        <label id="download-type-label" for="download-type" class="field-label">下载内容</label>
+        <select id="download-type"><option value="best">视频 + 音频</option><option value="audio">仅音频</option><option value="gif">GIF 动图 · 无声音</option><option value="subtitles">仅字幕</option></select>
+        <div id="subtitle-options" class="option-group" hidden>
+          <label id="subtitle-language-label" for="subtitle-language" class="field-label">字幕语言</label>
+          <select id="subtitle-language"><option value="zh-en">中文 + 英文</option><option value="zh">中文</option><option value="en">英文</option><option value="ja">日文</option><option value="all">全部可用语言</option></select>
+          <label id="subtitle-format-label" for="subtitle-format" class="field-label">字幕格式</label>
+          <select id="subtitle-format"><option value="srt">SRT</option><option value="vtt">WebVTT</option></select>
+          <label class="toggle"><input id="subtitle-auto" type="checkbox" checked><span id="subtitle-auto-label">包含站点自动字幕</span></label>
+          <p id="subtitle-hint" class="muted">只下载字幕文件，不下载视频。优先人工字幕，可包含站点自动生成的字幕；不生成新字幕。Bilibili 弹幕不属于字幕。全部语言可能产生大量文件。</p>
+        </div>
+        <div id="video-options" class="option-group">
+          <label id="quality-label" for="quality" class="field-label">画质上限</label>
+          <select id="quality"><option value="best">最佳可用画质 · 不限分辨率</option><option value="4320">最高 4320p · 8K</option><option value="2160">最高 2160p · 4K</option><option value="1440">最高 1440p · 2K</option><option value="1080">最高 1080p · Full HD</option><option value="720">最高 720p · HD</option><option value="480">最高 480p</option><option value="360">最高 360p</option><option value="240">最高 240p</option><option value="144">最高 144p</option></select>
+          <p id="quality-hint" class="muted">在所选上限内选最佳版本；实际画质取决于视频源，不会放大低分辨率视频。</p>
+        </div>
+        <div id="audio-options" class="option-group" hidden>
+          <label id="audio-format-label" for="audio-format" class="field-label">音频格式</label>
+          <select id="audio-format"><option value="original">原始音频 · 不重新编码（推荐）</option><option value="mp3">MP3 · 通用兼容</option><option value="m4a">M4A / AAC</option><option value="flac">FLAC</option><option value="wav">WAV</option></select>
+          <div id="audio-quality-group" class="option-group" hidden>
+            <label id="audio-quality-label" for="audio-quality" class="field-label">转换质量 / 目标码率</label>
+            <select id="audio-quality"><option value="best">最佳转换质量 · 自动码率</option><option value="320">320 kbps</option><option value="256">256 kbps</option><option value="192">192 kbps</option><option value="128">128 kbps</option></select>
+          </div>
+          <p id="audio-hint" class="muted">保留源音轨编码，避免额外损失；文件扩展名由源格式决定。</p>
+        </div>
+        <div id="gif-options" class="option-group" hidden>
+          <label id="gif-start-label" for="gif-start" class="field-label">起点（秒）</label><input id="gif-start" type="number" min="0" max="86400" step="1" value="0">
+          <label id="gif-duration-label" for="gif-duration" class="field-label">截取时长</label><select id="gif-duration"><option value="5">5 秒</option><option value="10">10 秒</option><option value="15" selected>15 秒</option><option value="30">30 秒</option><option value="60">60 秒</option></select>
+          <label id="gif-width-label" for="gif-width" class="field-label">宽度上限</label><select id="gif-width"><option value="320">320 px</option><option value="480" selected>480 px</option><option value="640">640 px</option></select>
+          <label id="gif-fps-label" for="gif-fps" class="field-label">帧率</label><select id="gif-fps"><option value="8">8 fps</option><option value="12" selected>12 fps</option><option value="15">15 fps</option><option value="20">20 fps</option></select>
+          <p id="gif-hint" class="muted">先下载源视频，再转换所选片段；不足指定时长则到片尾结束。GIF 无声音，较长、较大的动图会占用更多空间。</p>
+        </div>
+        <div class="option-group">
+          <label id="concurrency-label" for="concurrent-fragments" class="field-label">分片并发数</label>
+          <select id="concurrent-fragments" aria-describedby="concurrency-hint"><option value="1">1 · 单分片</option><option value="4" selected>4 · 推荐</option><option value="8">8</option><option value="16">16</option></select>
+          <p id="concurrency-hint" class="muted">仅对支持的 DASH / HLS 分片生效；普通 HTTP 文件不增加连接数。并发越高不一定越快。</p>
+        </div>
+        <label class="toggle"><input id="use-cookies" type="checkbox" checked><span><span id="cookie-label">使用当前 YouTube 登录会话</span><small id="cookie-hint">开启：使用登录身份下载；关闭：匿名下载</small></span></label>
+        <div class="permissions"><span id="permission-state">正在检查授权…</span><button id="grant" class="text-button">授权</button><button id="revoke" class="text-button" hidden>撤销</button></div>
+      </section>
+      <button id="download" class="primary" disabled><span id="download-label">下载当前视频</span> <span aria-hidden="true">↓</span></button>
+      <p id="message" role="status" aria-live="polite" hidden></p>
+      <p id="setup-message" role="status" aria-live="polite" hidden></p>
+      <section id="tasks" aria-live="polite"></section>
+      <details><summary><span id="host-status">本地桥接 · 尚未检测</span></summary><div class="diagnostics"><button id="check" class="secondary">检测并补齐依赖</button><p id="tools">检测 yt-dlp、FFmpeg 和下载目录。缺失时自动下载并校验，首次安装需联网。需先安装本地 Host。</p>
+        <div class="option-group"><label id="update-channel-label" for="update-channel" class="field-label">yt-dlp 更新通道</label><select id="update-channel"><option value="stable">稳定版</option><option value="nightly">每日构建 · 更快获得站点修复</option></select></div>
+        <div class="update-actions"><button id="update-check" class="secondary">检查更新</button><button id="update-install" class="secondary" disabled>更新 yt-dlp</button><button id="update-rollback" class="text-button" disabled>恢复上一版本</button></div>
+        <p id="update-status" class="muted" role="status">先检查版本，再选择更新。不会自动降级。</p>
+        <p id="update-note" class="muted">更新仅切换 VideoBridge 使用的 yt-dlp，保留原工具和上一版本。FFmpeg 仍通过“检测并补齐依赖”补齐。</p>
+        <p id="background-note" class="muted">关闭弹窗后任务继续；退出浏览器会停止任务。</p></div></details>
+      <p id="scope-note" class="muted">适用于 yt-dlp 支持的媒体页面，也会尝试通用提取。每次仅下载一个条目；会员、地区、DRM 等限制仍可能影响结果。</p><footer><span id="footer-left">本地处理 · 单条目下载</span><span>CHROME / EDGE</span></footer>
+    </main><script type="module" src="./main.ts"></script>
+  </body>
+</html>

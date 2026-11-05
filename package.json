@@ -1,0 +1,13 @@
+{
+  "name": "videobridge",
+  "private": true,
+  "version": "0.8.0",
+  "description": "A local YouTube download bridge for Chrome and Edge",
+  "scripts": {
+    "dev": "npm --prefix extension run dev",
+    "build": "npm --prefix extension run build",
+    "check": "npm --prefix extension run check",
+    "test": "npm --prefix extension test",
+    "test:ui": "npm --prefix extension run test:ui"
+  }
+}

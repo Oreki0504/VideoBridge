@@ -1,0 +1,5 @@
+{
+  "outputDir": "C:\\Users\\YOUR_USER\\Downloads\\VideoBridge",
+  "ytDlpPath": "C:\\Tools\\yt-dlp.exe",
+  "ffmpegPath": "C:\\Tools\\ffmpeg\\bin\\ffmpeg.exe"
+}

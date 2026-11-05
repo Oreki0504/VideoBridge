@@ -1,0 +1,25 @@
+{
+  "name": "videobridge-extension",
+  "version": "0.8.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wxt -b chrome",
+    "build": "wxt build -b chrome",
+    "build:edge": "wxt build -b edge",
+    "check": "wxt prepare && tsc --noEmit",
+    "test": "vitest run",
+    "test:ui": "node tests/popup-smoke.mjs",
+    "postinstall": "wxt prepare"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.1.0",
+    "playwright-core": "^1.64.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "wxt": "^0.20.13"
+  },
+  "dependencies": {
+    "tldts": "^7.4.19"
+  }
+}

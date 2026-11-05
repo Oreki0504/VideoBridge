@@ -1,0 +1,12 @@
+node_modules/
+.wxt/
+.output/
+dist/
+.cache/
+coverage/
+downloads/
+*.tmp
+*.log
+test-results/
+host/config.json
+docs/
