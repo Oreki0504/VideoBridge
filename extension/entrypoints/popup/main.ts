@@ -251,7 +251,7 @@ for (const [id,type] of [['update-check','ytdlp.check'],['update-install','ytdlp
 chrome.runtime.onMessage.addListener(event => { if (event?.type === 'state.changed') render(event.state); });
 async function init() {
   const settings = await chrome.storage.local.get(['useCookies', 'useCookiesX', 'downloadOptions', 'updateChannel', 'uiLanguage']);
-  locale = resolveLocale(settings.uiLanguage);
+  locale = resolveLocale(settings.uiLanguage, chrome.i18n?.getUILanguage() ?? navigator.language);
   if (settings.updateChannel === 'nightly') el<HTMLSelectElement>('update-channel').value = 'nightly';
   if (isDownloadOptions(settings.downloadOptions)) {
     const saved = settings.downloadOptions;

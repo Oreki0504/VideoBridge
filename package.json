@@ -8,6 +8,7 @@
     "build": "npm --prefix extension run build",
     "check": "npm --prefix extension run check",
     "test": "npm --prefix extension test",
-    "test:ui": "npm --prefix extension run test:ui"
+    "test:ui": "npm --prefix extension run test:ui",
+    "test:installer-guide": "npm --prefix extension run test:installer-guide"
   }
 }

@@ -9,6 +9,7 @@
 *.js       text eol=lf
 *.json     text eol=lf
 *.sh       text eol=lf
+*.command  text eol=lf
 
 # Documentation and configuration
 *.md       text eol=lf

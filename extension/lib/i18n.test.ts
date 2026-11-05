@@ -12,10 +12,13 @@ import {
 } from './i18n';
 
 describe('i18n helpers', () => {
-  it('defaults to zh and resolves en when selected', () => {
-    expect(resolveLocale(undefined)).toBe('zh');
-    expect(resolveLocale('zh')).toBe('zh');
-    expect(resolveLocale('en')).toBe('en');
+  it('follows browser language on first use and preserves an explicit choice', () => {
+    expect(resolveLocale(undefined, 'en-US')).toBe('en');
+    expect(resolveLocale(undefined, 'zh-CN')).toBe('zh');
+    expect(resolveLocale(undefined, 'zh-TW')).toBe('zh');
+    expect(resolveLocale('invalid', 'ja-JP')).toBe('en');
+    expect(resolveLocale('zh', 'en-US')).toBe('zh');
+    expect(resolveLocale('en', 'zh-CN')).toBe('en');
   });
 
   it('formats site, permission, and cookie labels in both locales', () => {

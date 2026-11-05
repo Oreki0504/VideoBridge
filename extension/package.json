@@ -10,6 +10,7 @@
     "check": "wxt prepare && tsc --noEmit",
     "test": "vitest run",
     "test:ui": "node tests/popup-smoke.mjs",
+    "test:installer-guide": "node tests/installer-guide.mjs",
     "postinstall": "wxt prepare"
   },
   "devDependencies": {

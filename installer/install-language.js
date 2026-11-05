@@ -1,0 +1,1 @@
+window.VIDEOBRIDGE_INSTALL_LANGUAGE = null;

@@ -21,7 +21,7 @@ $utf8 = New-Object Text.UTF8Encoding($false)
 $hostFile = 'videobridge-' + $build.sha256.Substring(0,12).ToLowerInvariant() + '.exe'
 Copy-Item -LiteralPath $exe -Destination (Join-Path $payload ('host\' + $hostFile))
 Copy-Item -LiteralPath (Join-Path $root 'dist\host\build-info.json') -Destination (Join-Path $payload 'host')
-foreach ($name in @('Configure-Installation.ps1','Unregister-Installation.ps1','welcome.html')) { Copy-Item -LiteralPath (Join-Path $root ('installer\' + $name)) -Destination (Join-Path $payload 'setup') }
+foreach ($name in @('Configure-Installation.ps1','Unregister-Installation.ps1','welcome.html','welcome.js','install-language.js')) { Copy-Item -LiteralPath (Join-Path $root ('installer\' + $name)) -Destination (Join-Path $payload 'setup') }
 [IO.File]::WriteAllText((Join-Path $payload 'setup\package-info.json'),(@{version=$build.version;extensionId=$extensionId} | ConvertTo-Json),$utf8)
 # Windows PowerShell 5.1 requires a BOM for Chinese source text.
 foreach ($name in @('Configure-Installation.ps1','Unregister-Installation.ps1')) {

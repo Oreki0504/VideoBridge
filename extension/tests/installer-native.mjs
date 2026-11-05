@@ -31,6 +31,8 @@ try{
  }));
  assert.equal(health.version,info.version);assert.ok(health.tools.every(t=>t.available));
  if(process.env.VB_INSTALLER_TEST_UPDATE_CHECK==='1'){
+  // Keep text assertions deterministic regardless of the machine's UI language.
+  await worker.evaluate(()=>chrome.storage.local.set({uiLanguage:'zh'}));
   const configFile=path.join(root,'host','config.json');
   const configBefore=await readFile(configFile);
   assert.ok(health.capabilities.includes('ytdlp.update'));

@@ -1,9 +1,39 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VideoBridge · 安装完成</title>
-<style>*{box-sizing:border-box}body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;margin:0;background:#10141c;color:#e8edf4;line-height:1.7}main{max-width:780px;margin:60px auto;padding:0 28px}header{display:flex;gap:16px;align-items:center}.mark{background:#b5f1cd;color:#16382b;font-size:40px;border-radius:16px;padding:0 16px}h1{font-size:28px;margin:0}header p{margin:0;color:#8fa0b5}.card{background:#1a2330;border:1px solid #354052;border-radius:16px;padding:24px;margin:26px 0}h2{font-size:19px;margin:0 0 12px}ol{padding-left:24px}li{padding:7px 0}code{background:#283447;padding:3px 7px;border-radius:5px}button{border:0;background:#b5f1cd;color:#16382b;border-radius:8px;padding:10px 16px;font:inherit;cursor:pointer}.path{display:block;overflow-wrap:anywhere;margin:12px 0;padding:12px;border:1px solid #354052;border-radius:8px}.muted{color:#a1b0c3;font-size:14px}#status{min-height:25px;color:#b5f1cd}</style></head><body><main>
-<header><div class="mark">↧</div><div><h1>VideoBridge 安装完成</h1><p>视频、音频、GIF，保存到本地。</p></div></header>
-<section class="card"><h2>最后一步：在浏览器中加载扩展</h2><ol><li>打开 Chrome 的 <code>chrome://extensions</code>；Edge 使用 <code>edge://extensions</code>。</li><li>开启右上角的“开发者模式”，点击“加载已解压的扩展程序”。</li><li>选择下面的固定目录：</li></ol><span id="path" class="path">正在读取安装目录…</span><button id="copy">复制扩展目录</button><p id="status" role="status"></p><p class="muted">目录已经由安装程序准备好，不用自己解压或复制文件。Chrome 商店版尚未发布，因此首次仍需手动加载一次。</p></section>
-<section class="card"><h2>开始下载</h2><p>打开 Bilibili、Niconico、YouTube 或其他媒体页面，点击 VideoBridge。选择视频、音频或 GIF，再点击下载。其他网站默认匿名；需要登录时，可单独授权当前站点会话。支持范围由 yt-dlp 决定，并非所有带视频的页面均能下载。</p><p>如果提示依赖未完成，点击“本地桥接”→“检测并补齐依赖”，等待安装结束。</p></section>
-<section class="card"><h2>从旧版迁移</h2><p>如果之前从项目或解压目录加载过 VideoBridge，先在扩展管理页移除旧的扩展，再加载上面的固定目录。移除扩展不会删除已经下载的视频；下载目录和本地工具配置会保留。新扩展需重新授予站点权限。</p><p class="muted">以后升级只需运行新安装程序，再重新加载扩展。卸载入口位于 Windows“已安装的应用”和开始菜单 VideoBridge；卸载保留下载文件、设置及已下载依赖。浏览器扩展需在扩展管理页移除。</p></section>
-<footer class="muted">所有程序组件集中在同一个 VideoBridge 安装目录。下载文件保存在你原有的目录；新安装默认使用 Downloads\VideoBridge。</footer>
-</main><script>const u=new URL('../extension/',location.href);const dir=decodeURIComponent(u.pathname).replace(/^\//,'').replaceAll('/','\\').replace(/\\$/,'');document.querySelector('#path').textContent=dir;document.querySelector('#copy').onclick=async()=>{try{await navigator.clipboard.writeText(dir);document.querySelector('#status').textContent='已复制。'}catch{document.querySelector('#status').textContent='请选中上面的路径并复制。'}};</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>VideoBridge · Installation Guide</title>
+  <style>
+    *{box-sizing:border-box}body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;margin:0;background:#10141c;color:#e8edf4;line-height:1.7}main{max-width:780px;margin:48px auto;padding:0 28px}header{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.mark{background:#b5f1cd;color:#16382b;font-size:40px;border-radius:16px;padding:0 16px}h1{font-size:28px;margin:0}header p{margin:0;color:#8fa0b5}.language{margin-left:auto}.card{background:#1a2330;border:1px solid #354052;border-radius:16px;padding:24px;margin:26px 0}h2{font-size:19px;margin:0 0 12px}ol{padding-left:24px}li{padding:7px 0}code{background:#283447;padding:3px 7px;border-radius:5px;overflow-wrap:anywhere}button{border:0;background:#b5f1cd;color:#16382b;border-radius:8px;padding:10px 16px;font:inherit;cursor:pointer}button:focus-visible{outline:2px solid white;outline-offset:3px}.path{display:block;overflow-wrap:anywhere;margin:12px 0;padding:12px;border:1px solid #354052;border-radius:8px}.muted{color:#a1b0c3;font-size:14px}#status{min-height:25px;color:#b5f1cd}footer{overflow-wrap:anywhere}@media(max-width:520px){main{padding:0 16px;margin:24px auto}.card{padding:18px}h1{font-size:23px}.language{margin-left:0}}
+  </style>
+  <script src="install-language.js" defer></script>
+  <script src="welcome.js" defer></script>
+</head>
+<body><main>
+  <header><div class="mark" aria-hidden="true">↧</div><div><h1 data-text="heading">VideoBridge Installation Guide</h1><p data-text="tagline">Videos, audio, GIFs and subtitles, saved locally.</p></div><button id="language" class="language" type="button" aria-label="切换到中文">简体中文</button></header>
+  <section class="card">
+    <h2 data-text="loadHeading">Next: load the browser extension</h2>
+    <ol>
+      <li><span data-text="openChrome">In Chrome, open</span> <code>chrome://extensions</code><span data-text="openEdge">; in Edge, open</span> <code>edge://extensions</code>.</li>
+      <li data-text="developerMode">Enable Developer mode and select Load unpacked.</li>
+      <li data-text="selectFolder">Select the installed folder below:</li>
+    </ol>
+    <span id="path" class="path"></span>
+    <button id="copy" type="button" data-text="copy">Copy extension folder</button><p id="status" role="status" aria-live="polite"></p>
+    <p class="muted" data-text="folderNote">Setup has prepared this folder; no manual extraction or copying is needed. VideoBridge is not yet available in the Chrome Web Store, so the extension must be loaded manually once.</p>
+  </section>
+  <section class="card">
+    <h2 data-text="downloadHeading">Start downloading</h2>
+    <p data-text="download">Open a YouTube, Bilibili, Niconico or other media page and click VideoBridge. Choose video, audio, GIF or subtitles. For content requiring login, grant site access and enable Use current site session. Availability depends on yt-dlp and the site's access rules.</p>
+    <p data-text="tools">If tools are missing, open Local Bridge and select Check &amp; Install Dependencies. If Setup reported a failure, run Setup again after resolving it.</p>
+    <p data-text="popupLanguage">The popup follows your browser language on first use. Use its EN / 中文 button to switch languages; your choice is saved.</p>
+  </section>
+  <section class="card">
+    <h2 data-text="upgradeHeading">Upgrade or move an existing installation</h2>
+    <p data-text="migration">If you previously loaded VideoBridge from a project or extracted folder, remove that old extension before loading the installed folder above. Downloads and local tool settings are preserved. Grant site permissions again for the new extension.</p>
+    <p class="muted" data-text="upgrade">For future upgrades, run the new installer and reload the extension. Uninstall from Windows Installed Apps or the VideoBridge Start menu folder. Downloaded files, settings and managed tools are kept; remove the browser extension separately.</p>
+  </section>
+  <footer class="muted" data-text="footer">Program files are stored together in your VideoBridge installation folder. Existing download folders are preserved; new installations default to Downloads\VideoBridge in your user profile.</footer>
+</main></body>
+</html>

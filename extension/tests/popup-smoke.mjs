@@ -25,7 +25,7 @@ try {
   for (const channel of ['chrome', 'msedge']) {
     const browser = await chromium.launch({ channel, headless: true });
     try {
-      const context = await browser.newContext({ viewport: { width: 400, height: 760 }, deviceScaleFactor: 1 });
+      const context = await browser.newContext({ viewport: { width: 400, height: 760 }, deviceScaleFactor: 1, locale: 'zh-CN' });
       const page = await context.newPage();
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));

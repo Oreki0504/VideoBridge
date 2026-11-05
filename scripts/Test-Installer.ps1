@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([Parameter(Mandatory)][string]$YtDlpPath,[Parameter(Mandatory)][string]$FFmpegPath)
+param([Parameter(Mandatory)][string]$YtDlpPath,[Parameter(Mandatory)][string]$FFmpegPath,[ValidateSet('english','chinesesimp')][string]$Language = 'english')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 $version = (Get-Content (Join-Path $root 'dist\installer-info.json') -Raw | ConvertFrom-Json).version
@@ -23,7 +23,7 @@ $legacyOrigin = 'chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/'
 $keys = @('HKCU:\Software\Google\Chrome\NativeMessagingHosts\com.videobridge.host','HKCU:\Software\Microsoft\Edge\NativeMessagingHosts\com.videobridge.host')
 $saved = @($keys | ForEach-Object { @{Key=$_;Exists=(Test-Path -LiteralPath $_);Value=$(if(Test-Path -LiteralPath $_){(Get-Item -LiteralPath $_).GetValue('')}else{$null})} })
 function Run-Setup([string]$log,[int]$expected = 0) {
-    $p = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/NOICONS',('/DIR="' + $app + '"'),'/TASKS="chrome,edge"',('/LOG="' + $log + '"')) -WindowStyle Hidden -PassThru -Wait
+    $p = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/NOICONS',('/LANG=' + $Language),('/DIR="' + $app + '"'),'/TASKS="chrome,edge"',('/LOG="' + $log + '"')) -WindowStyle Hidden -PassThru -Wait
     if ($p.ExitCode -ne $expected) { throw "Installer exit $($p.ExitCode), expected $expected; see $log" }
 }
 try {
@@ -37,7 +37,9 @@ try {
         if ($target -eq 'chrome' -and $m.allowed_origins -notcontains $legacyOrigin) { throw 'Legacy extension permission was lost.' }
     }
     Write-Output 'PASS: installation, uninstall entry, stable ID, legacy origin and Unicode configuration preservation.'
-    if (-not ([IO.File]::ReadAllText((Join-Path $testRoot 'install.log'))).Contains('浏览器连接已配置')) { throw 'Chinese setup progress encoding is incorrect.' }
+    if (-not ([IO.File]::ReadAllText((Join-Path $testRoot 'install.log'))).Contains('VB_STATUS:checking')) { throw 'Setup progress marker is missing.' }
+    $expectedLocale = if ($Language -eq 'chinesesimp') { 'zh' } else { 'en' }
+    if (-not ([IO.File]::ReadAllText((Join-Path $app 'setup\install-language.js'))).Contains('"' + $expectedLocale + '"')) { throw 'Installation guide language mismatch.' }
     [IO.File]::WriteAllText($configPath,'{"outputDir":"relative","ytDlpPath":"","ffmpegPath":""}',$utf8)
     Run-Setup (Join-Path $testRoot 'expected-failure.log') 1
     [IO.File]::WriteAllText($configPath,$configBefore,$utf8)

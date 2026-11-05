@@ -3,8 +3,9 @@ import { siteName } from './site-resolver';
 
 export type Locale = 'zh' | 'en';
 
-export function resolveLocale(saved: unknown): Locale {
-  return saved === 'en' ? 'en' : 'zh';
+export function resolveLocale(saved: unknown, browserLanguage = 'en'): Locale {
+  if (saved === 'en' || saved === 'zh') return saved;
+  return browserLanguage.toLowerCase().startsWith('zh') ? 'zh' : 'en';
 }
 
 export function localizedSiteName(site: Site, locale: Locale): string {

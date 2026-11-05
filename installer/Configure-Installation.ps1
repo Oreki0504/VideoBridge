@@ -2,6 +2,7 @@
 param(
     [Parameter(Mandatory)][string]$Root,
     [ValidateSet('Chrome','Edge','Both')][string]$Browser = 'Chrome',
+    [ValidateSet('english','chinesesimp')][string]$Language = 'english',
     [switch]$SkipDependencies
 )
 $ErrorActionPreference = 'Stop'
@@ -22,6 +23,8 @@ finally { $stream.Dispose(); $hasher.Dispose() }
 if ($actualHash -ne $build.sha256) { throw 'Host checksum mismatch.' }
 $configPath = Join-Path $hostDir 'config.json'
 $utf8 = New-Object Text.UTF8Encoding($false)
+$guideLocale = if ($Language -eq 'chinesesimp') { 'zh' } else { 'en' }
+[IO.File]::WriteAllText((Join-Path $Root 'setup\install-language.js'),('window.VIDEOBRIDGE_INSTALL_LANGUAGE = "' + $guideLocale + '";'),$utf8)
 if (-not (Test-Path -LiteralPath $configPath)) {
     $ytdlp = Get-Command yt-dlp.exe -ErrorAction SilentlyContinue
     $ffmpeg = Get-Command ffmpeg.exe -ErrorAction SilentlyContinue
@@ -46,7 +49,10 @@ foreach ($target in $targets) {
     New-Item -Path $registry -Force | Out-Null
     Set-Item -LiteralPath $registry -Value $manifestPath
 }
-Write-Output '浏览器连接已配置，正在检查本地依赖…'
-if ($SkipDependencies) { & $exe --check } else { & $exe --setup }
-if ($LASTEXITCODE -ne 0) { throw '依赖安装未完成；可重新运行安装程序，或在插件中点击“检测并补齐依赖”。' }
-Write-Output 'VideoBridge 安装配置完成。'
+Write-Output 'VB_STATUS:checking'
+if ($SkipDependencies) { & $exe --check } else { Write-Output 'VB_STATUS:installing'; & $exe --setup }
+if ($LASTEXITCODE -ne 0) {
+    if ($Language -eq 'chinesesimp') { throw '依赖安装未完成；可重新运行安装程序，或在插件中点击“检测并补齐依赖”。' }
+    throw 'Tool setup did not finish. Run Setup again, or use Check & Install Dependencies in the extension.'
+}
+Write-Output 'VB_STATUS:ready'
