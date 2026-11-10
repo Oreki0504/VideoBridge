@@ -172,7 +172,7 @@ try {
       // After reconnecting offline, local health alone must allow rollback.
       await page.evaluate(()=>{fixture.state.ytdlpUpdate=undefined;fixture.state.health.ytdlpCanRollback=true;fixture.publish();});
       assert.equal(await page.locator('#update-rollback').isEnabled(),true);
-      assert.equal(await page.locator('.version').textContent(),'0.8.0');
+      assert.equal(await page.locator('.version').textContent(),'0.9.0');
       await page.reload();
       assert.equal(await page.locator('#update-channel').inputValue(),'nightly');
       await page.locator('#grant').click();
@@ -286,6 +286,18 @@ try {
       await page.getByText('已授权 Bilibili Cookie',{exact:true}).waitFor();
       assert.equal(await page.locator('#download-label').textContent(),'下载字幕');
       await page.screenshot({path:fileURLToPath(new URL(`../../docs/screenshots/subtitles-zh-${channel}.png`,import.meta.url)),fullPage:true});
+      await page.locator('#theme-toggle').click();
+      assert.equal(await page.locator('html').getAttribute('data-theme'),'light');
+      assert.equal(await page.locator('#theme-toggle').textContent(),'☾ 深色');
+      await page.reload();
+      assert.equal(await page.locator('html').getAttribute('data-theme'),'light');
+      await page.locator('.mode-tab[data-mode="best"]').click();
+      await page.evaluate(()=>{
+        fixture.state.jobs=[{jobId:'light-1',status:'running',phase:'下载中',percent:64.2,speed:10485760,eta:9}];fixture.publish();
+      });
+      await page.screenshot({path:fileURLToPath(new URL(`../../docs/screenshots/popup-light-${channel}.png`,import.meta.url)),fullPage:true});
+      await page.locator('#theme-toggle').click();
+      assert.equal(await page.locator('html').getAttribute('data-theme'),'dark');
       assert.deepEqual(errors, []);
       console.log(`PASS ${channel}: video/audio/GIF options, X URL and anonymous default, site permissions, concurrency, persistence, setup progress, cancel and layout; browser ${browser.version()}`);
     } finally { await browser.close(); }

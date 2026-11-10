@@ -113,7 +113,7 @@ func (c Config) ToolPaths() (string, string, string) {
 }
 func (c Config) Health() Health {
 	y, f, p := c.ToolPaths()
-	h := Health{Version: "0.8.0", Capabilities: []string{"x", "gif", "subtitles", "tools.ensure", "generic-sites", "ytdlp.update"}, OutputDir: c.OutputDir, Tools: []Tool{}}
+	h := Health{Version: "0.9.0", Capabilities: []string{"x", "gif", "subtitles", "tools.ensure", "generic-sites", "ytdlp.update"}, OutputDir: c.OutputDir, Tools: []Tool{}}
 	h.YTDLPCanRollback = findTool(c.PreviousYTDLPPath, "") != ""
 	for i, path := range []string{y, f, p} {
 		tool := Tool{Name: []string{"yt-dlp", "ffmpeg", "ffprobe"}[i], Path: path}

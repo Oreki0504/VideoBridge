@@ -48,6 +48,7 @@ const messages = {
 const browserLocale = navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
 const installedLocale = window.VIDEOBRIDGE_INSTALL_LANGUAGE;
 let locale = installedLocale === 'en' || installedLocale === 'zh' ? installedLocale : browserLocale;
+let theme = 'dark';
 let statusKey = '';
 const extensionURL = new URL('../extension/', location.href);
 const directory = decodeURIComponent(extensionURL.pathname).replace(/^\//, '').replaceAll('/', '\\').replace(/\\$/, '');
@@ -59,12 +60,26 @@ function render() {
   for (const element of document.querySelectorAll('[data-text]')) {
     element.textContent = messages[locale][element.dataset.text];
   }
+  document.documentElement.dataset.theme = theme;
+  const themeButton = document.querySelector('#theme');
+  if (themeButton) {
+    const isLight = theme === 'light';
+    themeButton.textContent = locale === 'zh' ? (isLight ? '☾ 深色' : '☀ 浅色') : (isLight ? '☾ Dark' : '☀ Light');
+    themeButton.setAttribute('aria-label', locale === 'zh' ? (isLight ? '切换到深色模式' : '切换到浅色模式') : (isLight ? 'Switch to dark mode' : 'Switch to light mode'));
+  }
   const languageButton = document.querySelector('#language');
   languageButton.textContent = locale === 'en' ? '简体中文' : 'English';
   languageButton.setAttribute('aria-label', locale === 'en' ? '切换到中文' : 'Switch to English');
   document.querySelector('#status').textContent = statusKey ? messages[locale][statusKey] : '';
 }
 
+const themeToggle = document.querySelector('#theme');
+if (themeToggle) {
+  themeToggle.onclick = () => {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    render();
+  };
+}
 document.querySelector('#language').onclick = () => {
   locale = locale === 'en' ? 'zh' : 'en';
   render();

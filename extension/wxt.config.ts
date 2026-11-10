@@ -4,7 +4,7 @@ export default defineConfig({
   manifest: {
     name: 'VideoBridge',
     description: 'Download media and subtitles from YouTube, Bilibili and other yt-dlp sites, or convert videos to GIF.',
-    version: '0.8.0',
+    version: '0.9.0',
     minimum_chrome_version: '120',
     permissions: ['activeTab', 'storage', 'nativeMessaging'],
     optional_permissions: ['cookies'],

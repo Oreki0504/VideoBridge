@@ -16,7 +16,7 @@ func packageFixture(t *testing.T) string {
 	for name, data := range map[string]string{
 		"host/darwin-arm64/videobridge": "arm executable fixture",
 		"host/darwin-amd64/videobridge": "intel executable fixture",
-		"extension/manifest.json":       `{"name":"VideoBridge","version":"0.8.0","manifest_version":3}`,
+		"extension/manifest.json":       `{"name":"VideoBridge","version":"0.9.0","manifest_version":3}`,
 		"extension/chunks/popup.js":     "fixture",
 		"Install.command":               "fixture installer",
 	} {
@@ -199,7 +199,7 @@ func TestDeliveredMacPackage(t *testing.T) {
 			Version string `json:"version"`
 			Key     string `json:"key"`
 		}
-		if json.Unmarshal(manifest, &m) != nil || m.Version != "0.8.0" || m.Key == "" {
+		if json.Unmarshal(manifest, &m) != nil || m.Version != "0.9.0" || m.Key == "" {
 			t.Fatal("wrong delivered extension")
 		}
 		if err = Unregister(home); err != nil {

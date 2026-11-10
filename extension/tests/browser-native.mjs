@@ -108,7 +108,7 @@ try{
  const status=await popup.evaluate('chrome.runtime.sendMessage({type:"host.check"})');
  assert.equal(status.ok,true,JSON.stringify(status));
  assert.equal(status.data.health.tools.every(t=>t.available),true);
- assert.equal(status.data.health.version,'0.8.0');
+ assert.equal(status.data.health.version,'0.9.0');
  assert.ok(status.data.health.capabilities.includes('gif'));
  report.hostVersion=status.data.health.version;
  check('browser launches real Go Host and tool diagnostics');

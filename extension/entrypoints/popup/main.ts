@@ -3,6 +3,7 @@ import { resolveVideo, sitePermission, cookieSettingKey, usesCookies } from '../
 import { isDownloadOptions } from '../../lib/download-options';
 import {
   type Locale,
+  type Theme,
   UI_TEXT,
   formatCookieLabel,
   formatEta,
@@ -11,6 +12,7 @@ import {
   formatToolsHealth,
   formatUpdateStatus,
   resolveLocale,
+  resolveTheme,
   translateDynamicText,
 } from '../../lib/i18n';
 import { type Site, type AudioFormat, type AudioQuality, type FragmentConcurrency, type Options, type State, type SubtitleLanguage, type SubtitleFormat } from '../../lib/types';
@@ -18,6 +20,7 @@ import { type Site, type AudioFormat, type AudioQuality, type FragmentConcurrenc
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const download = el<HTMLButtonElement>('download');
 const cookies = el<HTMLInputElement>('use-cookies');
+const modeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('.mode-tab'));
 let validVideo = false;
 let busy = false;
 let submitting = false;
@@ -27,6 +30,7 @@ let securePage = true;
 let lastState: State | undefined;
 let toolSubmitting = false;
 let locale: Locale = 'zh';
+let theme: Theme = 'dark';
 let rawMessage = '';
 
 function setSelectOptionLabels(selectId: string, labels: Record<string, string>) {
@@ -55,14 +59,30 @@ function selectedOptions(): Options {
   return { format: 'best', concurrentFragments, ...(quality !== 'best' ? { maxHeight: Number(quality) } : {}) };
 }
 
+function syncSessionCardState() {
+  const card = el('session-card');
+  card.classList.toggle('is-ready', cookies.checked && permitted);
+  card.classList.toggle('needs-grant', cookies.checked && !permitted);
+}
+
 function updateOptions() {
   const t = UI_TEXT[locale];
-  const audio = el<HTMLSelectElement>('download-type').value === 'audio';
-  const gif = el<HTMLSelectElement>('download-type').value === 'gif';
-  const subtitles = el<HTMLSelectElement>('download-type').value === 'subtitles';
+  const mode = el<HTMLSelectElement>('download-type').value;
+  const audio = mode === 'audio';
+  const gif = mode === 'gif';
+  const subtitles = mode === 'subtitles';
   const format = el<HTMLSelectElement>('audio-format').value;
+  for (const btn of modeButtons) {
+    const active = btn.dataset.mode === mode;
+    btn.classList.toggle('is-active', active);
+    btn.setAttribute('aria-selected', String(active));
+  }
   el('video-options').hidden = audio || gif || subtitles;
   el('subtitle-options').hidden = !subtitles;
+  el('concurrency-group').hidden = subtitles;
+  el('concurrency-group').classList.toggle('option-span-full', gif || (audio && format === 'mp3'));
+  el('audio-options').classList.toggle('option-span-full', audio && format === 'mp3');
+  el('audio-options').classList.toggle('option-grid-2col', audio && format === 'mp3');
   el('download-label').textContent = subtitles ? t.subtitleDownload : t.downloadButton;
   el('gif-options').hidden = !gif;
   el('audio-options').hidden = !audio;
@@ -73,6 +93,17 @@ function updateOptions() {
       ? t.audioHints.lossless
       : format === 'm4a' ? t.audioHints.m4a
         : t.audioHints.mp3;
+}
+
+function applyTheme() {
+  const t = UI_TEXT[locale];
+  document.documentElement.dataset.theme = theme;
+  const btn = el<HTMLButtonElement>('theme-toggle');
+  const isLight = theme === 'light';
+  btn.textContent = isLight ? t.themeToggleDark : t.themeToggleLight;
+  const title = isLight ? t.themeToggleToDarkTitle : t.themeToggleToLightTitle;
+  btn.title = title;
+  btn.setAttribute('aria-label', title);
 }
 
 function applyLocale() {
@@ -91,6 +122,10 @@ function applyLocale() {
   el('x-hint').textContent = t.xHint;
   el('download-type-label').textContent = t.downloadTypeLabel;
   setSelectOptionLabels('download-type', t.downloadTypes);
+  for (const btn of modeButtons) {
+    const key = btn.dataset.mode as keyof typeof t.modeTabs;
+    if (t.modeTabs[key]) btn.textContent = t.modeTabs[key];
+  }
   el('subtitle-language-label').textContent = t.subtitleLanguageLabel;
   setSelectOptionLabels('subtitle-language', t.subtitleLanguages);
   el('subtitle-format-label').textContent = t.subtitleFormatLabel;
@@ -129,9 +164,21 @@ function applyLocale() {
   el('background-note').textContent = t.backgroundNote;
   el('scope-note').textContent = t.scopeNote;
   el('footer-left').textContent = t.footerLeft;
+  applyTheme();
   updateOptions();
+  syncSessionCardState();
   if (rawMessage) message(rawMessage);
   if (lastState) render(lastState);
+}
+
+for (const btn of modeButtons) {
+  btn.onclick = () => {
+    const select = el<HTMLSelectElement>('download-type');
+    if (btn.dataset.mode && select.value !== btn.dataset.mode) {
+      select.value = btn.dataset.mode;
+      select.dispatchEvent(new Event('change'));
+    }
+  };
 }
 
 for (const id of ['download-type', 'quality', 'audio-format', 'audio-quality', 'concurrent-fragments', 'gif-start', 'gif-duration', 'gif-width', 'gif-fps', 'subtitle-language', 'subtitle-format', 'subtitle-auto']) {
@@ -149,7 +196,10 @@ function message(text = '') {
   el('message').textContent = translated;
   el('message').hidden = !translated;
 }
-function updateButton() { download.disabled = !validVideo || busy || submitting || !isDownloadOptions(selectedOptions()) || (cookies.checked && !permitted); }
+function updateButton() {
+  syncSessionCardState();
+  download.disabled = !validVideo || busy || submitting || !isDownloadOptions(selectedOptions()) || (cookies.checked && !permitted);
+}
 async function send(type: string, payload: Record<string, unknown> = {}): Promise<State> {
   const reply = await chrome.runtime.sendMessage({ type, ...payload });
   if (!reply?.ok) throw new Error(`${translateDynamicText(reply?.message ?? UI_TEXT[locale].bridgeNoResponse, locale)}${reply?.code ? ` (${reply.code})` : ''}`);
@@ -179,18 +229,31 @@ function render(state: State) {
     ? formatUpdateStatus(update, locale)
     : t.updateStatusDefault;
   el('host-status').textContent = state.connected ? t.hostConnected : t.hostDisconnected;
+  const bridgeDot = el('bridge-dot');
+  bridgeDot.classList.toggle('is-online', !!state.connected);
+  bridgeDot.classList.toggle('is-offline', !state.connected);
   if (state.health) {
     el('tools').textContent = formatToolsHealth(state.health, locale);
   }
   const container = el('tasks'); container.replaceChildren();
   for (const job of state.jobs.slice(-3).reverse()) {
-    const article = document.createElement('article'); article.className = 'task';
+    const article = document.createElement('article');
+    article.className = `task is-${job.status}`;
     const head = document.createElement('div'); head.className = 'task-head';
     const title = document.createElement('span'); title.textContent = job.status === 'failed' ? t.downloadFailed : translateDynamicText(job.phase, locale); head.append(title);
     if (job.status === 'running') {
-      const cancel = document.createElement('button'); cancel.className = 'text-button'; cancel.textContent = t.cancel;
+      const cancel = document.createElement('button'); cancel.className = 'text-button'; cancel.type = 'button'; cancel.textContent = t.cancel;
       cancel.onclick = async () => { cancel.disabled = true; try { render(await send('download.cancel', { jobId: job.jobId })); } catch (e) { message((e as Error).message); cancel.disabled = false; } };
       head.append(cancel);
+    } else if (job.status === 'completed' && job.files?.length) {
+      const copy = document.createElement('button'); copy.className = 'text-button'; copy.type = 'button'; copy.textContent = t.copyPath;
+      copy.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(job.files!.join('\n'));
+          copy.textContent = t.copiedPath;
+        } catch {}
+      };
+      head.append(copy);
     }
     article.append(head);
     if (job.status === 'running' || job.status === 'completed') {
@@ -204,6 +267,11 @@ function render(state: State) {
     article.append(detail); container.append(article);
   }
 }
+el('theme-toggle').onclick = () => {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  void chrome.storage.local.set({ uiTheme: theme });
+  applyTheme();
+};
 el('lang-toggle').onclick = () => {
   locale = locale === 'zh' ? 'en' : 'zh';
   void chrome.storage.local.set({ uiLanguage: locale });
@@ -250,8 +318,9 @@ for (const [id,type] of [['update-check','ytdlp.check'],['update-install','ytdlp
 }
 chrome.runtime.onMessage.addListener(event => { if (event?.type === 'state.changed') render(event.state); });
 async function init() {
-  const settings = await chrome.storage.local.get(['useCookies', 'useCookiesX', 'downloadOptions', 'updateChannel', 'uiLanguage']);
+  const settings = await chrome.storage.local.get(['useCookies', 'useCookiesX', 'downloadOptions', 'updateChannel', 'uiLanguage', 'uiTheme']);
   locale = resolveLocale(settings.uiLanguage, chrome.i18n?.getUILanguage() ?? navigator.language);
+  theme = resolveTheme(settings.uiTheme);
   if (settings.updateChannel === 'nightly') el<HTMLSelectElement>('update-channel').value = 'nightly';
   if (isDownloadOptions(settings.downloadOptions)) {
     const saved = settings.downloadOptions;
@@ -276,6 +345,7 @@ async function init() {
     el('video-title').textContent = tab?.title?.replace(/ - YouTube$/, '') || video.videoId;
     el('video-url').textContent = video.url;
   } catch { validVideo = false; }
+  el('page-dot').classList.toggle('is-idle', !validVideo);
   const siteSettings = await chrome.storage.local.get(cookieSettingKey(site));
   cookies.checked = securePage && usesCookies(siteSettings,site);
   cookies.disabled = !securePage;

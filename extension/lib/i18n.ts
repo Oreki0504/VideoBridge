@@ -2,6 +2,11 @@ import type { Site } from './types';
 import { siteName } from './site-resolver';
 
 export type Locale = 'zh' | 'en';
+export type Theme = 'dark' | 'light';
+
+export function resolveTheme(saved: unknown): Theme {
+  return saved === 'light' ? 'light' : 'dark';
+}
 
 export function resolveLocale(saved: unknown, browserLanguage = 'en'): Locale {
   if (saved === 'en' || saved === 'zh') return saved;
@@ -28,6 +33,10 @@ export const UI_TEXT = {
     htmlLang: 'zh-CN',
     langToggleLabel: 'EN',
     langToggleTitle: 'Switch to English',
+    themeToggleLight: '☀ 浅色',
+    themeToggleDark: '☾ 深色',
+    themeToggleToLightTitle: '切换到浅色模式',
+    themeToggleToDarkTitle: '切换到深色模式',
     brandSubtitle: '浏览器里的视频，本地的文件。',
     currentPageSuffix: '当前页面',
     readingVideo: '正在读取视频…',
@@ -35,6 +44,9 @@ export const UI_TEXT = {
     invalidPageUrl: '支持 yt-dlp 可识别的媒体网站，包括 Bilibili、Niconico 等',
     xHint: '默认下载帖子中的第一个视频；链接含 /video/2 等编号时下载对应视频。X 默认使用匿名模式。',
     downloadTypeLabel: '下载内容',
+    modeTabs: { best: '视频', audio: '音频', gif: 'GIF', subtitles: '字幕' },
+    copyPath: '复制路径',
+    copiedPath: '已复制',
     downloadTypes: {
       best: '视频 + 音频',
       audio: '仅音频',
@@ -143,6 +155,10 @@ export const UI_TEXT = {
     htmlLang: 'en',
     langToggleLabel: '中文',
     langToggleTitle: '切换到中文',
+    themeToggleLight: '☀ Light',
+    themeToggleDark: '☾ Dark',
+    themeToggleToLightTitle: 'Switch to light mode',
+    themeToggleToDarkTitle: 'Switch to dark mode',
     brandSubtitle: 'Browser videos, saved locally.',
     currentPageSuffix: 'Current Page',
     readingVideo: 'Reading page…',
@@ -150,6 +166,9 @@ export const UI_TEXT = {
     invalidPageUrl: 'Supports media sites recognized by yt-dlp, including YouTube, Bilibili, Niconico, X, and more',
     xHint: 'Downloads the first video by default, or the matching clip when the URL ends with /video/2, etc. X uses anonymous mode by default.',
     downloadTypeLabel: 'Download Mode',
+    modeTabs: { best: 'Video', audio: 'Audio', gif: 'GIF', subtitles: 'Subtitles' },
+    copyPath: 'Copy path',
+    copiedPath: 'Copied',
     downloadTypes: {
       best: 'Video + Audio',
       audio: 'Audio Only',
